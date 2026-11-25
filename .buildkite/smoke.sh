@@ -25,7 +25,8 @@ if ! command -v nix >/dev/null; then
     export NIX_CONFIG="${NIX_CONFIG:-}"$'\nbuild-users-group ='
     sudo install -d -o "$(id -u)" /nix
     bash "$scratch/install" --no-daemon --no-channel-add --no-modify-profile
-    source "$HOME/.nix-profile/etc/profile.d/nix.sh"
+    # The profile script skips PATH setup if USER is unset in the job shell.
+    USER="${USER:-$(id -un)}" source "$HOME/.nix-profile/etc/profile.d/nix.sh"
   fi
 fi
 
