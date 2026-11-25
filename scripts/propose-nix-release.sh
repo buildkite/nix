@@ -13,14 +13,14 @@ release_repo=buildkite/agent
 base=main
 branch="release/nix/${tag}"
 manifest=nix/release.json
-generator="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/nix-release-manifest.rb"
+generator="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/nix-release-manifest.jq"
 
 : "${GH_TOKEN:?Missing Nix publishing credential}"
 
 # The publisher starts in a fresh checkout of the destination's main branch.
 scratch=$(mktemp -d)
 trap 'rm -rf "$scratch"' EXIT
-current=$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV[0])).fetch("version")' "$manifest")
+current=$(jq -er '.version' "$manifest")
 if [[ "$version" == "$current" || "$(printf '%s\n' "$current" "$version" | sort -V | tail -1)" != "$version" ]]; then
   echo "Skipping Nix bump: main already pins $current (release is $version)"
   exit 0
@@ -41,12 +41,12 @@ fi
 # The Exchange token can write only to the Nix repo. Read public Agent release
 # data anonymously so the token is never needed for a second repository.
 if ! curl -fsSL "https://api.github.com/repos/$release_repo/releases/tags/$tag" \
-  | ruby -rjson -e 'release = JSON.parse(STDIN.read); exit(release["draft"] == false && release["prerelease"] == false)'; then
+  | jq -e '.draft == false and .prerelease == false' >/dev/null; then
   echo "Expected a published stable GitHub release: $tag" >&2
   exit 1
 fi
 curl -fsSL "https://github.com/$release_repo/releases/download/$tag/buildkite-agent-${version}.SHA256SUMS" \
-  | ruby "$generator" "$version" > "$scratch/release.json"
+  | jq -Rs --arg version "$version" -f "$generator" > "$scratch/release.json"
 
 existing_branch=$(git ls-remote --heads origin "refs/heads/$branch")
 previous_head=

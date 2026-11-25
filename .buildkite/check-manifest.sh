@@ -2,7 +2,7 @@
 set -euo pipefail
 
 manifest=nix/release.json
-version=$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).fetch("version")' "$manifest")
+version=$(jq -er '.version' "$manifest")
 if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   echo "Expected a stable version, got $version" >&2
   exit 1
@@ -21,7 +21,7 @@ if [[ "$BUILDKITE_BRANCH" == release/nix/* ]]; then
 fi
 
 if ! git diff --quiet "$base" HEAD -- "$manifest" && git cat-file -e "$main:$manifest" 2>/dev/null; then
-  current=$(git show "$main:$manifest" | ruby -rjson -e 'puts JSON.parse(STDIN.read).fetch("version")')
+  current=$(git show "$main:$manifest" | jq -er '.version')
   if [[ "$version" == "$current" || $(printf '%s\n' "$current" "$version" | sort -V | tail -1) != "$version" ]]; then
     echo "The Nix manifest must advance the version ($current -> $version)." >&2
     exit 1
@@ -29,4 +29,4 @@ if ! git diff --quiet "$base" HEAD -- "$manifest" && git cat-file -e "$main:$man
 fi
 
 curl -fsSL "https://github.com/buildkite/agent/releases/download/v${version}/buildkite-agent-${version}.SHA256SUMS" \
-  | ruby scripts/nix-release-manifest.rb "$version" | diff -u "$manifest" -
+  | jq -Rs --arg version "$version" -f scripts/nix-release-manifest.jq | diff -u "$manifest" -

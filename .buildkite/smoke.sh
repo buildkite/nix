@@ -35,7 +35,7 @@ fi
 if [[ "$system" == x86_64-linux ]]; then
   nix flake check --all-systems --no-build --no-update-lock-file .
 fi
-expected=$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV.fetch(0))).fetch("version")' nix/release.json)
+expected=$(jq -er '.version' nix/release.json)
 out=$(nix build --no-link --print-out-paths --no-update-lock-file .#buildkite-agent)
 actual=$("$out/bin/buildkite-agent" --version)
 echo "$actual"
