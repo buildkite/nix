@@ -1,7 +1,6 @@
 # Buildkite packages for Nix
 
-This flake is the home for Buildkite's public Nix packages. Select a package
-by name; the flake does not have a default package.
+This flake is the home for Buildkite's public Nix packages.
 
 ## Buildkite Agent
 
