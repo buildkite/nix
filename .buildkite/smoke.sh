@@ -21,6 +21,8 @@ if ! command -v nix >/dev/null; then
     bash "$scratch/install" --daemon --yes --no-channel-add --no-modify-profile
     source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
   else
+    # Hosted Linux jobs run as root. A single-user install has no nixbld group.
+    export NIX_CONFIG="${NIX_CONFIG:-}"$'\nbuild-users-group ='
     sudo install -d -o "$(id -u)" /nix
     bash "$scratch/install" --no-daemon --no-channel-add --no-modify-profile
     source "$HOME/.nix-profile/etc/profile.d/nix.sh"
