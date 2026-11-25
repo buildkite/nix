@@ -13,15 +13,13 @@ nix run --no-update-lock-file .#buildkite-agent -- --version
 Keep `flake.lock` updates in separate, reviewed PRs from agent version bumps.
 
 The [Buildkite pipeline](.buildkite/pipeline.yml) checks the manifest against
-published checksums, evaluates all four outputs, and builds and runs the agent
+published checksums, evaluates all package outputs, and builds and runs the agent
 natively on each platform. It runs on same-repository PRs without publishing
 credentials. The required `buildkite/nix` status must pass on an up-to-date
 branch.
 
 The Open Source cluster uses `hosted` for Linux amd64, `nix-linux-arm64` for
-Linux arm64, and `macos` for macOS arm64. The `nix-macos-amd64` queue needs an
-isolated native Intel Mac with Nix 2.35.3; Buildkite-hosted Macs are Apple
-silicon only.
+Linux arm64, and `macos` for macOS arm64.
 
 ## Publish the agent package
 

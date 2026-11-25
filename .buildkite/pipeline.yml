@@ -26,10 +26,3 @@ steps:
       queue: macos
     command: .buildkite/smoke.sh aarch64-darwin
     timeout_in_minutes: 20
-
-  - label: ":nix: Smoke test (macOS amd64)"
-    depends_on: manifest
-    agents:
-      queue: nix-macos-amd64
-    command: .buildkite/smoke.sh x86_64-darwin
-    timeout_in_minutes: 20

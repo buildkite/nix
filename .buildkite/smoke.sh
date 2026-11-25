@@ -5,18 +5,14 @@ system=$1
 case "$system" in
   x86_64-linux)   native=Linux:x86_64 ;;
   aarch64-linux)  native=Linux:aarch64 ;;
-  x86_64-darwin)  native=Darwin:x86_64 ;;
   aarch64-darwin) native=Darwin:arm64 ;;
 esac
-if [[ "$(uname -s):$(uname -m)" != "$native" ]] ||
-   [[ "$system" == x86_64-darwin && "$(sysctl -in sysctl.proc_translated)" == 1 ]]; then
+if [[ "$(uname -s):$(uname -m)" != "$native" ]]; then
   echo "Expected a native $system runner" >&2
   exit 1
 fi
 
 if ! command -v nix >/dev/null; then
-  # Hosted jobs are disposable. Persistent runners should provision Nix on the
-  # image instead. This release is the last installer with Intel Mac binaries.
   scratch=$(mktemp -d)
   trap 'rm -rf "$scratch"' EXIT
   curl -fsSL https://releases.nixos.org/nix/nix-2.35.3/install -o "$scratch/install"

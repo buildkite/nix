@@ -23,7 +23,6 @@ to find the entry name, then `nix profile upgrade <name>` to update just that
 entry. Pin a revision with `github:buildkite/nix/<commit>#buildkite-agent` or
 add the flake as an input and let your `flake.lock` pin it.
 
-The flake supports amd64 and arm64 on Linux and macOS. The current Intel Mac
-output depends on nixpkgs 26.05, the last nixpkgs release to support it.
+The flake supports Linux on amd64 and arm64, and macOS on Apple silicon.
 
 See [Contributing](CONTRIBUTING.md) for development and release details.
