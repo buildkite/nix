@@ -1,0 +1,35 @@
+steps:
+  - label: ":nix: Check release manifest"
+    key: manifest
+    agents:
+      queue: hosted
+    command: .buildkite/check-manifest.sh
+    timeout_in_minutes: 5
+
+  - label: ":nix: Smoke test (Linux amd64)"
+    depends_on: manifest
+    agents:
+      queue: hosted
+    command: .buildkite/smoke.sh x86_64-linux
+    timeout_in_minutes: 20
+
+  - label: ":nix: Smoke test (Linux arm64)"
+    depends_on: manifest
+    agents:
+      queue: nix-linux-arm64
+    command: .buildkite/smoke.sh aarch64-linux
+    timeout_in_minutes: 20
+
+  - label: ":nix: Smoke test (macOS arm64)"
+    depends_on: manifest
+    agents:
+      queue: macos
+    command: .buildkite/smoke.sh aarch64-darwin
+    timeout_in_minutes: 20
+
+  - label: ":nix: Smoke test (macOS amd64)"
+    depends_on: manifest
+    agents:
+      queue: nix-macos-amd64
+    command: .buildkite/smoke.sh x86_64-darwin
+    timeout_in_minutes: 20

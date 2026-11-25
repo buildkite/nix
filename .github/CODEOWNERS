@@ -1,0 +1,3 @@
+# Require Engineering review for everything except the generated agent manifest.
+* @buildkite/engineering
+/nix/release.json
